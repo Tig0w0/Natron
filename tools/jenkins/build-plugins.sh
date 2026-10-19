@@ -197,6 +197,14 @@ if [ "$BUILD_MISC" = "1" ] && [ -d "$TMP_PATH/openfx-misc" ]; then
 
         echo "Info: make all except CImg."
 
+        # UI-only Windows QA build: modern MSYS2 Mesa lacks the legacy mangled
+        # OSMesa headers required by the Shadertoy CPU renderer. Do not remove
+        # other openfx-misc plugins; skip only Shadertoy in this situation.
+        miscSubdirs=""
+        if [ "$PKGOS" = "Windows" ] && [ ! -f "${OSMESA_PATH}/include/GL/gl_mangle.h" ]; then
+            echo "Warning: legacy OSMesa gl_mangle.h unavailable; building Misc without Shadertoy for UI QA"
+            miscSubdirs="SUBDIRS=Misc"
+        fi
         env \
             OSMESA_PATH="${OSMESA_PATH}" \
             LLVM_PATH="${LLVM_PATH}" \
@@ -210,7 +218,7 @@ if [ "$BUILD_MISC" = "1" ] && [ -d "$TMP_PATH/openfx-misc" ]; then
             HAVE_CIMG=0 \
             ${OMP} \
             CXXFLAGS_EXTRA="-DHAVE_OSMESA ${CXXFLAGS_EXTRA}" \
-            make -j"${MKJOBS}" ${MAKEFLAGS_VERBOSE:-}
+            make -j"${MKJOBS}" ${MAKEFLAGS_VERBOSE:-} ${miscSubdirs}
 
         echo "Info: make CImg."
 
