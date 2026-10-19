@@ -27,7 +27,7 @@ jobs:
         with:
           msystem: mingw64
           update: true
-          install: git make unzip mingw-w64-x86_64-wget mingw-w64-x86_64-python mingw-w64-x86_64-pkgconf mingw-w64-x86_64-qt5-base mingw-w64-x86_64-gcc mingw-w64-x86_64-llvm mingw-w64-x86_64-make
+          install: git make unzip mingw-w64-x86_64-wget mingw-w64-x86_64-python mingw-w64-x86_64-pkgconf mingw-w64-x86_64-qt5-base mingw-w64-x86_64-gcc mingw-w64-x86_64-llvm mingw-w64-x86_64-make mingw-w64-x86_64-libgomp
 
       - name: Install Natron pacman repository
         run: |
@@ -43,6 +43,13 @@ jobs:
           done
           gcc --version | head -n 1
           llvm-config --version
+          test -f /mingw64/lib/libgomp.a || { echo "Missing libgomp static library" >&2; exit 1; }
+          echo "Confirmed /mingw64/lib/libgomp.a"
+          if test -f /mingw64/include/GL/gl_mangle.h; then
+            echo "Legacy mangled OSMesa header available"
+          else
+            echo "Legacy mangled OSMesa header absent; Shadertoy will be excluded"
+          fi
           ls -l /mingw64/bin/*qmake* || true
           ls -ld /mingw64/qt5 /mingw64/bin/qt5* || true
 
