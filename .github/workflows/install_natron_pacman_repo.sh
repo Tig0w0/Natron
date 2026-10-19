@@ -20,20 +20,14 @@ cd ${NATRON_REPO_DIR}
 
 WINDOWS_PACMAN_REPO_VERSION=`cat ${NATRON_DIR}/tools/MINGW-packages/windows_pacman_repo_version.txt`
 ZIP_FILENAME="natron_package_repo-${WINDOWS_PACMAN_REPO_VERSION}.zip"
-wget https://github.com/NatronGitHub/Natron/releases/download/windows-mingw-package-repo/${ZIP_FILENAME}
-
-if [[ -e ${ZIP_FILENAME} ]]; then
-    unzip ${ZIP_FILENAME}
-else
-    echo "Failed to fetch ${ZIP_FILENAME}"
-
-    echo "Building pacman repo locally."
-
-    # install necessary dependencies for building pacman repo.
-    pacman -S --needed --noconfirm git base-devel
-
-    ${NATRON_DIR}/tools/MINGW-packages/build_natron_package_repo.sh ${NATRON_REPO_DIR}
+# Use the pinned, published Natron dependency snapshot.
+# Fail immediately if unavailable rather than silently rebuilding outdated
+# dependencies with incompatible current MSYS2/autoconf versions.
+if ! wget --tries=3 --timeout=40 "https://github.com/NatronGitHub/Natron/releases/download/windows-mingw-package-repo/${ZIP_FILENAME}"; then
+    echo "ERROR: Missing pinned Natron pacman archive: ${ZIP_FILENAME}" >&2
+    exit 1
 fi
+unzip -o "${ZIP_FILENAME}"
 
 UNIX_NATRON_REPO_DIR=`cygpath -u ${NATRON_REPO_DIR}`
 natron_repo_init ${UNIX_NATRON_REPO_DIR}
