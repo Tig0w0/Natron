@@ -175,11 +175,14 @@ KnobTableItemDelegate::paint(QPainter * painter,
     }
     QPen pen;
 
+    // Respect the active UI theme instead of hard-coding black for disabled cells.
+    // The project-paths table uses disabled cells for built-in variables, and
+    // black-on-dark text becomes unreadable with modern dark color schemes.
+    QColor textColor = option.palette.color(QPalette::Active, QPalette::Text);
     if ( !item->flags().testFlag(Qt::ItemIsEnabled) ) {
-        pen.setColor(Qt::black);
-    } else {
-        pen.setColor( QColor(200, 200, 200) );
+        textColor.setAlpha(200);
     }
+    pen.setColor(textColor);
     painter->setPen(pen);
 
     // get the proper subrect from the style
