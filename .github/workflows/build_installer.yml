@@ -27,7 +27,7 @@ jobs:
         with:
           msystem: mingw64
           update: true
-          install: git make unzip mingw-w64-x86_64-wget mingw-w64-x86_64-python mingw-w64-x86_64-pkgconf mingw-w64-x86_64-qt5-base mingw-w64-x86_64-gcc mingw-w64-x86_64-llvm mingw-w64-x86_64-make mingw-w64-x86_64-libgomp
+          install: git make patch unzip mingw-w64-x86_64-wget mingw-w64-x86_64-python mingw-w64-x86_64-pkgconf mingw-w64-x86_64-qt5-base mingw-w64-x86_64-gcc mingw-w64-x86_64-llvm mingw-w64-x86_64-make mingw-w64-x86_64-libgomp
 
       - name: Install Natron pacman repository
         run: |
@@ -38,7 +38,7 @@ jobs:
         run: |
           set -eu
           export PATH="/mingw64/bin:$PATH"
-          for tool in gcc g++ llvm-config pkg-config python3 make; do
+          for tool in gcc g++ llvm-config pkg-config python3 make patch; do
             command -v "$tool" || { echo "Missing: $tool" >&2; exit 1; }
           done
           gcc --version | head -n 1
